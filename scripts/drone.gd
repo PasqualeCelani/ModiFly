@@ -1,5 +1,6 @@
 extends CharacterBody3D
 
+
 @export var max_speed: float = 50.0
 @export var vertical_speed: float = 5.0
 @export var rotation_speed: float = 30.0
@@ -10,13 +11,21 @@ extends CharacterBody3D
 @export var vertical_deceleration: float = 5.0
 @export var speed_ramp_rate: float = 10.0  # How fast speed increases/decreases
 
+
 var current_speed: float = 0.0  # Incremental horizontal speed
 var current_velocity = Vector3.ZERO
 var target_direction = Vector3.ZERO
+var animator
+
+func _ready() -> void:
+	animator = $"Sketchfab_Scene/AnimationPlayer"
+	
 
 func _physics_process(delta: float) -> void:
 	var gesture_node = get_node("/root/MainScene/GestureClient")
 	var command = gesture_node.current_command
+	
+	animator.play("Vole stationnaire")
 
 	target_direction = Vector3.ZERO
 	
