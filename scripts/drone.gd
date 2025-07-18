@@ -18,8 +18,23 @@ var target_direction = Vector3.ZERO
 
 var animator
 
+@onready var fps_camera = $FPSCamera
+@onready var tps_camera = $ThirdPersonCamera
+
+
 func _ready() -> void:
 	animator = $"Sketchfab_Scene/AnimationPlayer"
+	
+
+
+func _input(event):
+	if event.is_action_pressed("switch_camera"):
+		if fps_camera.current:
+			fps_camera.current = false
+			tps_camera.current = true
+		else:
+			fps_camera.current = true
+			tps_camera.current = false
 
 func _physics_process(delta: float) -> void:
 	var gesture_node = get_node("/root/MainScene/GestureClient")
