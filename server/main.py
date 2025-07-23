@@ -3,11 +3,14 @@ import json
 import cv2
 import mediapipe as mp
 import time
+import speech_recognition as sr
+import threading
 
 UDP_IP = "127.0.0.1"  
 UDP_PORT = 5005 
 
 CALLBACK_GESTURE = "None"
+VOICE_COMMAND = "None"
 
 def is_thumb_left(hand_landmarks):
     lm = hand_landmarks.landmark
@@ -56,8 +59,36 @@ def result_callback(result, output_image, timestamp_ms):
                 if gesture == "Open_Palm":
                     CALLBACK_GESTURE = "Open_Palm_Right"
 
+
+def listen_in_background():
+    global VOICE_COMMAND
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        r.adjust_for_ambient_noise(source, duration=2)
+
+    while True:
+        try:
+            with sr.Microphone() as source:
+                audio = r.listen(source, timeout=2, phrase_time_limit=1)
+                text = r.recognize_google(audio).lower()
+                if text == "open":
+                    VOICE_COMMAND = text
+                elif text == "shut down":
+                    VOICE_COMMAND = text
+                else:
+                    VOICE_COMMAND = "None"
+        except sr.WaitTimeoutError:
+            continue
+        except sr.UnknownValueError:
+            print("Unknown word!")
+        except sr.RequestError as e:
+            print(f"API error: {e}")
+
+
 def main():
     global CALLBACK_GESTURE
+    global VOICE_COMMAND
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     cap = cv2.VideoCapture(0)
 
@@ -86,6 +117,9 @@ def main():
 
     recognizer = GestureRecognizer.create_from_options(options)
     prev_timestamp_ms = 0
+
+    voice_thread = threading.Thread(target=listen_in_background, daemon=True)
+    voice_thread.start()    
 
     while cap.isOpened():
         success, image = cap.read()
@@ -146,12 +180,19 @@ def main():
                         print("rotate_left")
                         gesture_by_hand["right"] = "rotate_left"
 
+        
+        data_to_send = {
+            "gestures_commands" : gesture_by_hand,
+            "voice_commands" : VOICE_COMMAND
+        }
+
         CALLBACK_GESTURE  = "None"
-        send_udp_message(sock, gesture_by_hand)
+        VOICE_COMMAND = "None"
+        send_udp_message(sock, data_to_send)
 
         #----- For DEBUG ---- 
         #cv2.imshow("Hand Gesture Recognition", image)
-        #----- For DEBUG ---- 
+        #----- For DEBUG ----             
 
         if cv2.waitKey(1) & 0xFF == 27:  # ESC key
             break
