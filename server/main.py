@@ -69,18 +69,25 @@ def listen_in_background():
     while True:
         try:
             with sr.Microphone() as source:
-                audio = r.listen(source, timeout=2, phrase_time_limit=1)
+                audio = r.listen(source, timeout=2, phrase_time_limit=2)
                 text = r.recognize_google(audio).lower()
+                print(text)
                 if text == "open":
                     VOICE_COMMAND = text
                 elif text == "shut down":
+                    VOICE_COMMAND = text
+                elif text == "zoom in":
+                    VOICE_COMMAND = text
+                elif text == "zoom out":
+                    VOICE_COMMAND = text
+                elif text == "stop":
                     VOICE_COMMAND = text
                 else:
                     VOICE_COMMAND = "None"
         except sr.WaitTimeoutError:
             continue
-        except sr.UnknownValueError:
-            print("Unknown word!")
+        except sr.UnknownValueError as e:
+            print(f"Unknown word!")
         except sr.RequestError as e:
             print(f"API error: {e}")
 
