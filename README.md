@@ -21,5 +21,8 @@ The ModiFly simulator is currently only available on macOS systems with an Intel
  2. Open the downloaded `.dmg` file and drag the ModiFly application to your `/Applications` folder;
  3. Inside the repository, locate and run the `run.sh` script. This will launch the necessary backend server and the ModiFly application.
 
+## :books: Documentation
+All the required documentation can be found in `/doc/main.pdf` contained in this repository. This documentation is useful for gaining a better understanding of the project's idea, goals, and scope.
+
 ## :paperclip: License 
 This project is released under the MIT License.
