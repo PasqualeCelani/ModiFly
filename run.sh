@@ -1,6 +1,15 @@
 #!/bin/bash
 
 cd ./server
+
+# Check if the 'venv' directory exists. If it doesn't, create it.
+if [ ! -d "venv" ]; then
+  echo "Virtual environment not found. Creating it now..."
+  python -m venv venv
+  pip install -r requirements.txt
+  echo "Virtual environment 'venv' has been created."
+fi
+
 source ./venv/bin/activate
 
 python main.py &
