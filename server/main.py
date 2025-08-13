@@ -62,13 +62,22 @@ def result_callback(result, output_image, timestamp_ms):
 
 def listen_in_background():
     global VOICE_COMMAND
+
+    """
+    Debug Only
+    for index, name in enumerate(sr.Microphone.list_microphone_names()):
+        print(f"Microphone with name '{name}' found at index {index}")
+    """
+
+    mic_index = 0
+
     r = sr.Recognizer()
-    with sr.Microphone() as source:
+    with sr.Microphone(device_index=mic_index) as source:
         r.adjust_for_ambient_noise(source, duration=2)
 
     while True:
         try:
-            with sr.Microphone() as source:
+            with sr.Microphone(device_index=mic_index) as source:
                 audio = r.listen(source, timeout=2, phrase_time_limit=2)
                 text = r.recognize_google(audio).lower()
                 print(text)
