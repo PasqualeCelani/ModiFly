@@ -5,12 +5,13 @@ import mediapipe as mp
 import time
 import speech_recognition as sr
 import threading
+import queue
 
 UDP_IP = "127.0.0.1"  
 UDP_PORT = 5005 
 
 CALLBACK_GESTURE = "None"
-VOICE_COMMAND = "None"
+voice_command_queue = queue.Queue() 
 
 def is_thumb_left(hand_landmarks):
     lm = hand_landmarks.landmark
@@ -60,45 +61,34 @@ def result_callback(result, output_image, timestamp_ms):
                     CALLBACK_GESTURE = "Open_Palm_Right"
 
 
-def listen_in_background():
+def callback(recognizer, audio):
     global VOICE_COMMAND
+    try:
+        text = recognizer.recognize_google(audio).lower()
+        print(f"Recognized: {text}")
+        if text in ["open", "shut down", "zoom in", "zoom out", "stop"]:
+            voice_command_queue.put(text)
+    except sr.UnknownValueError:
+        print("Could not understand audio")
+    except sr.RequestError as e:
+        print(f"API Error: {e}")
 
-    """
-    Debug Only
-    for index, name in enumerate(sr.Microphone.list_microphone_names()):
-        print(f"Microphone with name '{name}' found at index {index}")
-    """
 
+
+def listen_continuously():
+    r = sr.Recognizer()
     mic_index = 0
 
-    r = sr.Recognizer()
+    print("Adjusting for ambient noise...")
     with sr.Microphone(device_index=mic_index) as source:
-        r.adjust_for_ambient_noise(source, duration=2)
+        r.adjust_for_ambient_noise(source)
+    print("Ready for commands.")
+
+    r.listen_in_background(sr.Microphone(device_index=mic_index), callback)
 
     while True:
-        try:
-            with sr.Microphone(device_index=mic_index) as source:
-                audio = r.listen(source, timeout=2, phrase_time_limit=2)
-                text = r.recognize_google(audio).lower()
-                print(text)
-                if text == "open":
-                    VOICE_COMMAND = text
-                elif text == "shut down":
-                    VOICE_COMMAND = text
-                elif text == "zoom in":
-                    VOICE_COMMAND = text
-                elif text == "zoom out":
-                    VOICE_COMMAND = text
-                elif text == "stop":
-                    VOICE_COMMAND = text
-                else:
-                    VOICE_COMMAND = "None"
-        except sr.WaitTimeoutError:
-            continue
-        except sr.UnknownValueError as e:
-            print(f"Unknown word!")
-        except sr.RequestError as e:
-            print(f"API error: {e}")
+        print(f"Current command: {VOICE_COMMAND}")
+        time.sleep(1)
 
 
 def main():
@@ -134,7 +124,7 @@ def main():
     recognizer = GestureRecognizer.create_from_options(options)
     prev_timestamp_ms = 0
 
-    voice_thread = threading.Thread(target=listen_in_background, daemon=True)
+    voice_thread = threading.Thread(target=listen_continuously, daemon=True)
     voice_thread.start()    
 
     while cap.isOpened():
@@ -177,7 +167,7 @@ def main():
         if results.multi_hand_landmarks:
             for hand_landmarks, hand_handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
                 #----- For DEBUG ---- 
-                #mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+                mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
                 #----- For DEBUG ---- 
                 hand_label = hand_handedness.classification[0].label
                 if hand_label == "Left" and (not isClassifierGestureRec):
@@ -196,10 +186,15 @@ def main():
                         print("rotate_left")
                         gesture_by_hand["right"] = "rotate_left"
 
-        
+        voice_command = "None"
+        try:
+            voice_command = voice_command_queue.get_nowait()
+        except queue.Empty:
+            pass
+
         data_to_send = {
-            "gestures_commands" : gesture_by_hand,
-            "voice_commands" : VOICE_COMMAND
+            "gestures_commands": gesture_by_hand,
+            "voice_commands": voice_command
         }
 
         CALLBACK_GESTURE  = "None"
@@ -207,7 +202,8 @@ def main():
         send_udp_message(sock, data_to_send)
 
         #----- For DEBUG ---- 
-        #cv2.imshow("Hand Gesture Recognition", image)
+        cv2.namedWindow('Modifly', cv2.WINDOW_NORMAL)
+        cv2.imshow("Modifly", image)
         #----- For DEBUG ----             
 
         if cv2.waitKey(1) & 0xFF == 27:  # ESC key
