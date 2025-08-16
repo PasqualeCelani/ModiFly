@@ -1,7 +1,6 @@
 # ModiFly
 ModiFly is a simulator designed to test a new Human-Drone Interaction (HDI) model that moves beyond traditional, joystick-based interfaces. The project leverages natural human communication modalities, specifically gestures and speech, to create a more intuitive and seamless control experience. The system is designed to be low-cost, easy to use, and capable of running on low-end hardware.
 
-<br>
 
 ## :movie_camera: :arrow_forward: Showcase 
 [![Watch the video](http://img.youtube.com/vi/hgjOizbrNE0/maxresdefault.jpg)](http://www.youtube.com/watch?v=hgjOizbrNE0)
