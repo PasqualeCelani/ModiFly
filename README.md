@@ -1,6 +1,10 @@
 # ModiFly
 ModiFly is a simulator designed to test a new Human-Drone Interaction (HDI) model that moves beyond traditional, joystick-based interfaces. The project leverages natural human communication modalities, specifically gestures and speech, to create a more intuitive and seamless control experience. The system is designed to be low-cost, easy to use, and capable of running on low-end hardware.
 
+<br>
+
+[![Watch the video](http://img.youtube.com/vi/hgjOizbrNE0/maxresdefault.jpg)](http://www.youtube.com/watch?v=hgjOizbrNE0)
+
 ##  :rocket: Key Features
 * :large_blue_diamond: **Multimodal interaction:**  integrates two primary modalities such as gestures for continuous drone movement and voice commands for discrete, supportive functions;
 * :open_hands: **Two handed gesture control:** A two-handed gesture system is used for handling drone movement, with the left hand controlling position (lateral, altitude, forward/backward) and the right hand controlling rotational yaw;
