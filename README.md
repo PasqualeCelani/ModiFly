@@ -3,6 +3,7 @@ ModiFly is a simulator designed to test a new Human-Drone Interaction (HDI) mode
 
 <br>
 
+## :movie_camera: :arrow_forward: Showcase 
 [![Watch the video](http://img.youtube.com/vi/hgjOizbrNE0/maxresdefault.jpg)](http://www.youtube.com/watch?v=hgjOizbrNE0)
 
 ##  :rocket: Key Features
