@@ -167,7 +167,7 @@ def main():
         if results.multi_hand_landmarks:
             for hand_landmarks, hand_handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
                 #----- For DEBUG ---- 
-                mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+                #mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
                 #----- For DEBUG ---- 
                 hand_label = hand_handedness.classification[0].label
                 if hand_label == "Left" and (not isClassifierGestureRec):
@@ -202,8 +202,8 @@ def main():
         send_udp_message(sock, data_to_send)
 
         #----- For DEBUG ---- 
-        cv2.namedWindow('Modifly', cv2.WINDOW_NORMAL)
-        cv2.imshow("Modifly", image)
+        #cv2.namedWindow('Modifly', cv2.WINDOW_NORMAL)
+        #cv2.imshow("Modifly", image)
         #----- For DEBUG ----             
 
         if cv2.waitKey(1) & 0xFF == 27:  # ESC key
